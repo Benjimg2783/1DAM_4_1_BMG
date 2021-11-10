@@ -15,7 +15,7 @@ data class Modulo(val maxAlumnos: Int) {
 
     fun establecerNota(idAlumno: String: String, evaluacion: String, nota: Double): Boolean {
         if (evaluacion == EV_PRIMERA && evaluacion == EV_SEGUNDA && evaluacion == EV_TERCERA) {
-            notas[evaluacion.toInt()][aMatriculados[idAlumno].toInt]=nota
+            notas[evaluacion.toInt()][aMatriculados.indexOfFirst { it?.idAlumno == idAlumno }]=nota
         }
     }
 
