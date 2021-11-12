@@ -1,6 +1,6 @@
 data class Modulo(val maxAlumnos: Int) {
-    var alumnos = arrayOfNulls<Alumno?>(maxAlumnos)
-    val evaluaciones = Array(4) { DoubleArray(maxAlumnos) { 0.0 } }
+    private var alumnos = arrayOfNulls<Alumno?>(maxAlumnos)
+    private val evaluaciones = Array(4) { DoubleArray(maxAlumnos) { 0.0 } }
 
     init {
         require(maxAlumnos > 0) { "El numero máximo de alumnos es obligatorio y debe ser positivo" }
@@ -59,6 +59,26 @@ data class Modulo(val maxAlumnos: Int) {
         return mayor
     }
 
+    fun notaMedia (evaluacion: String):Double{
+        var media=0.0
+        var alumnosCalificados=0
+        for (i in alumnos.indices){
+            if (evaluaciones[evaluacion.toInt()][i]>0.0) {
+                media += evaluaciones[evaluacion.toInt()][i]
+                alumnosCalificados++
+            }
+        }
+        media /= alumnosCalificados
+        return media
+    }
+
+    fun hayAlumnosConDiez(evaluacion: String):Boolean{
+        var diez=false
+        for (i in alumnos.indices){
+            if (evaluaciones[evaluacion.toInt()][i]==10.0) diez=true
+        }
+        return diez
+    }
 
     fun matricularAlumno(a: Alumno): Boolean {//Comprueba si el alumno esta matriculado, si no es así lo matricula
         var comprobarAlumno = false
@@ -91,9 +111,7 @@ data class Modulo(val maxAlumnos: Int) {
     }
 }
 
-class Alumno(val id: String, val nombre: String, val apellidos: String) {
-
-}
+class Alumno(val id: String, val nombre: String, val apellidos: String)
 
 fun main() {
     val programacion = Modulo(15)
@@ -124,6 +142,7 @@ fun main() {
     programacion.calcularEvaluacionFinal("B123")
     programacion.bajaAlumno("F123")
     println("En la primera evaluacion hay ${programacion.numeroAprovados("0")} aprovados")
-    println("La nota más baja de la evaluacion final es ${programacion.notaMasBaja("0")}")
+    println("La nota más baja de la primera evaluacion es ${programacion.notaMasBaja("0")}")
     println("La nota más alta de la evaluacion final es ${programacion.notaMasAlta("3")}")
+    println("La nota media de la primera evaluación es ${programacion.notaMedia("0")}")
 }
