@@ -1,53 +1,98 @@
 data class Modulo(val maxAlumnos: Int) {
-    var aMatriculados = arrayOfNulls<Alumno?>(maxAlumnos)
-    val notas = Array(4) { DoubleArray(maxAlumnos) { 0.0 } }
-    var count = 0
-
-    companion object {
-        const val EV_PRIMERA = "0"
-        const val EV_SEGUNDA = "1"
-        const val EV_TERCERA = "2"
-    }
+    var alumnos = arrayOfNulls<Alumno?>(maxAlumnos)
+    val evaluaciones = Array(4) { DoubleArray(maxAlumnos) { 0.0 } }
 
     init {
-        require(maxAlumnos > 0 && maxAlumnos != null) { "El numero máximo de alumnos es obligatorio y debe ser positivo" }
+        require(maxAlumnos > 0) { "El numero máximo de alumnos es obligatorio y debe ser positivo" }
     }
 
-    fun establecerNota(idAlumno: String: String, evaluacion: String, nota: Double): Boolean {
-        if (evaluacion == EV_PRIMERA && evaluacion == EV_SEGUNDA && evaluacion == EV_TERCERA) {
-            notas[evaluacion.toInt()][aMatriculados.indexOfFirst { it?.idAlumno == idAlumno }]=nota
+    fun establecerNota(
+        idAlumno: String,
+        evaluacion: String,
+        nota: Double
+    ) {//Establece la nota de un alumno en una evaluacion concreta.
+        if (evaluacion == "0" || evaluacion == "1" || evaluacion == "2") {
+            evaluaciones[evaluacion.toInt()][alumnos.indexOfFirst { it?.id == idAlumno }] = nota
+        } else println("La evauación de ser representada con un 0 si es la primera, un 1 si es la segunda o un 2 si es la tercera.")
+    }
+
+    fun calcularEvaluacionFinal(idAlumno: String) {
+        var evFinal =
+            evaluaciones[0][alumnos.indexOfFirst { it?.id == idAlumno }] + evaluaciones[1][alumnos.indexOfFirst { it?.id == idAlumno }] + evaluaciones[2][alumnos.indexOfFirst { it?.id == idAlumno }]
+        evFinal /= 3
+        evaluaciones[3][alumnos.indexOfFirst { it?.id == idAlumno }] = evFinal
+    }
+
+    fun numeroAprovados(evaluacion: String): Int {
+        var numAprovados = 0
+        if (evaluacion == "0" || evaluacion == "1" || evaluacion == "2") {
+            for (i in alumnos.indices) {
+                if (evaluaciones[evaluacion.toInt()][i] >= 5) {
+                    numAprovados++
+                }
+            }
         }
+        return numAprovados
     }
 
-    fun matricularAlumno(a: Alumno): Boolean {
+    fun notaMasBaja(evaluacion: String): Double {
+        var count = 0
+        var menor = evaluaciones[evaluacion.toInt()][0]
+        while (count < alumnos.size) {
+            if ((evaluaciones[evaluacion.toInt()][count] < menor) && (evaluaciones[evaluacion.toInt()][count] > 0.0)) {
+                menor = evaluaciones[evaluacion.toInt()][count]
+                count++
+            } else count++
+        }
+        return menor
+    }
+
+    fun notaMasAlta(evaluacion: String): Double {
+        var count = 0
+        var mayor = evaluaciones[evaluacion.toInt()][0]
+        while (count < alumnos.size) {
+            if ((evaluaciones[evaluacion.toInt()][count] > mayor) && (evaluaciones[evaluacion.toInt()][count] > 0.0)) {
+                mayor = evaluaciones[evaluacion.toInt()][count]
+                count++
+            } else count++
+        }
+        return mayor
+    }
+
+
+    fun matricularAlumno(a: Alumno): Boolean {//Comprueba si el alumno esta matriculado, si no es así lo matricula
         var comprobarAlumno = false
-        for (i in 0 until maxAlumnos) {
-            if (aMatriculados[i] == a) comprobarAlumno = false
-            else comprobarAlumno = true
-        }
-        if (count < maxAlumnos && comprobarAlumno) {
-            aMatriculados[count] = a
-            count++
+        var count = 0
+        while ((count in 0 until maxAlumnos) && (!comprobarAlumno)) {
+            if (alumnos.indexOfFirst { it?.id == a.id } == -1) {
+                alumnos[alumnos.indexOfFirst { it?.id == null }] = a
+                comprobarAlumno = true
+            } else {
+                count++
+                comprobarAlumno = false
+            }
         }
         return comprobarAlumno
     }
 
-    fun bajaAlumno(idAlumno: String): Boolean {
+    fun bajaAlumno(idAlumno: String): Boolean {//Comprueba si el alumno está matriculado, si es así, le da de baja
         var comprobarAlumno = false
-        for (i in 0 until maxAlumnos) {
-            if (aMatriculados[i]?.idAlumno == idAlumno) {
-                aMatriculados[i] = null
+        var count = 0
+        while ((count in 0 until maxAlumnos) && (!comprobarAlumno)) {
+            if (alumnos.indexOfFirst { it?.id == idAlumno } != -1) {
+                alumnos[alumnos.indexOfFirst { it?.id == idAlumno }] = null
                 comprobarAlumno = true
-            } else comprobarAlumno = false
+            } else {
+                count++
+                comprobarAlumno = false
+            }
         }
         return comprobarAlumno
     }
 }
 
-class Alumno(val idAlumno: String, val nombre: String, val apellidos: String) {
-    init {
-        require(idAlumno != null) { "Id del alumno requerido" }
-    }
+class Alumno(val id: String, val nombre: String, val apellidos: String) {
+
 }
 
 fun main() {
@@ -72,4 +117,13 @@ fun main() {
     programacion.matricularAlumno(alumno8)
     programacion.matricularAlumno(alumno9)
     programacion.matricularAlumno(alumno10)
+    programacion.establecerNota("A123","0",7.0)
+    programacion.establecerNota("B123", "0", 5.0)
+    programacion.establecerNota("B123", "1", 7.5)
+    programacion.establecerNota("B123", "2", 10.0)
+    programacion.calcularEvaluacionFinal("B123")
+    programacion.bajaAlumno("F123")
+    println("En la primera evaluacion hay ${programacion.numeroAprovados("0")} aprovados")
+    println("La nota más baja de la evaluacion final es ${programacion.notaMasBaja("0")}")
+    println("La nota más alta de la evaluacion final es ${programacion.notaMasAlta("3")}")
 }
