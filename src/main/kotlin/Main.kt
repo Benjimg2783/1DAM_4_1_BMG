@@ -16,11 +16,21 @@ data class Modulo(val maxAlumnos: Int) {
         } else println("La evauación de ser representada con un 0 si es la primera, un 1 si es la segunda o un 2 si es la tercera.")
     }
 
-    fun calcularEvaluacionFinal(idAlumno: String) {
+    fun calculaEvaluacionFinal(idAlumno: String) {
         var evFinal =
             evaluaciones[0][alumnos.indexOfFirst { it?.id == idAlumno }] + evaluaciones[1][alumnos.indexOfFirst { it?.id == idAlumno }] + evaluaciones[2][alumnos.indexOfFirst { it?.id == idAlumno }]
         evFinal /= 3
         evaluaciones[3][alumnos.indexOfFirst { it?.id == idAlumno }] = evFinal
+    }
+
+    fun listaNotas(evaluacion: String): List<Pair<Alumno, Double>> {
+        val listaNota: MutableList<Pair<Alumno, Double>> = mutableListOf()
+        if ((evaluacion == "0" || evaluacion == "1" || evaluacion == "2")) {
+            for (i in 0 until maxAlumnos) {
+                if (alumnos[i] != null) listaNota.add(Pair(alumnos[i]!!, evaluaciones[evaluacion.toInt()][i]))
+            }
+        }
+        return listaNota
     }
 
     fun numeroAprovados(evaluacion: String): Int {
@@ -36,48 +46,55 @@ data class Modulo(val maxAlumnos: Int) {
     }
 
     fun notaMasBaja(evaluacion: String): Double {
-        var count = 0
-        var menor = evaluaciones[evaluacion.toInt()][0]
-        while (count < alumnos.size) {
-            if ((evaluaciones[evaluacion.toInt()][count] < menor) && (evaluaciones[evaluacion.toInt()][count] > 0.0)) {
-                menor = evaluaciones[evaluacion.toInt()][count]
-                count++
-            } else count++
-        }
-        return menor
+        return if (evaluacion == "0" || evaluacion == "1" || evaluacion == "2") evaluaciones[evaluacion.toInt()].filter { it > 0.0 }
+            .minOrNull() ?: (-1.0)
+        else 0.0
     }
 
     fun notaMasAlta(evaluacion: String): Double {
-        var count = 0
-        var mayor = evaluaciones[evaluacion.toInt()][0]
-        while (count < alumnos.size) {
-            if ((evaluaciones[evaluacion.toInt()][count] > mayor) && (evaluaciones[evaluacion.toInt()][count] > 0.0)) {
-                mayor = evaluaciones[evaluacion.toInt()][count]
-                count++
-            } else count++
-        }
-        return mayor
+        return if (evaluacion == "0" || evaluacion == "1" || evaluacion == "2") evaluaciones[evaluacion.toInt()].filter { it > 0.0 }
+            .maxOrNull() ?: (-1.0)
+        else 0.0
     }
 
-    fun notaMedia (evaluacion: String):Double{
-        var media=0.0
-        var alumnosCalificados=0
-        for (i in alumnos.indices){
-            if (evaluaciones[evaluacion.toInt()][i]>0.0) {
-                media += evaluaciones[evaluacion.toInt()][i]
-                alumnosCalificados++
+    fun notaMedia(evaluacion: String): Double {
+        var media = 0.0
+        var alumnosCalificados = 0
+        if (evaluacion == "0" || evaluacion == "1" || evaluacion == "2") {
+            for (i in alumnos.indices) {
+                if (evaluaciones[evaluacion.toInt()][i] > 0.0) {
+                    media += evaluaciones[evaluacion.toInt()][i]
+                    alumnosCalificados++
+                }
             }
         }
         media /= alumnosCalificados
         return media
     }
 
-    fun hayAlumnosConDiez(evaluacion: String):Boolean{
-        var diez=false
-        for (i in alumnos.indices){
-            if (evaluaciones[evaluacion.toInt()][i]==10.0) diez=true
+    fun hayAlumnosConDiez(evaluacion: String): Boolean {
+        return if (evaluacion == "0" || evaluacion == "1" || evaluacion == "2") evaluaciones[evaluacion.toInt()].any { it >= 5.0 }
+        else false
+    }
+
+    fun hayAlumnosAprobados(evaluacion: String): Boolean {
+        return if (evaluacion == "0" || evaluacion == "1" || evaluacion == "2") evaluaciones[evaluacion.toInt()].any { it >= 5.0 }
+        else false
+    }
+
+    fun primeraNotaNoAprovada(evaluacion: String): Double {
+        return if (evaluacion == "0" || evaluacion == "1" || evaluacion == "2") evaluaciones[evaluacion.toInt()][evaluaciones[evaluacion.toInt()].indexOfFirst { (it < 5.0) && (it > 0.0) }]
+        else 0.0
+    }
+
+    fun listaNotasOrdenadas(evaluacion: String):List<Pair<Alumno,Double>>{
+        val listaNota:MutableList<Pair<Alumno,Double>> = mutableListOf()
+        if ((evaluacion == "0" || evaluacion == "1" || evaluacion == "2")){
+            for(i in 0 until maxAlumnos){
+                if (alumnos[i]!=null) listaNota.add(Pair(alumnos[i]!!,evaluaciones[evaluacion.toInt()][i]))
+            }
         }
-        return diez
+        return listaNota.sortedBy { it.second }
     }
 
     fun matricularAlumno(a: Alumno): Boolean {//Comprueba si el alumno esta matriculado, si no es así lo matricula
@@ -135,11 +152,11 @@ fun main() {
     programacion.matricularAlumno(alumno8)
     programacion.matricularAlumno(alumno9)
     programacion.matricularAlumno(alumno10)
-    programacion.establecerNota("A123","0",7.0)
+    programacion.establecerNota("A123", "0", 7.0)
     programacion.establecerNota("B123", "0", 5.0)
     programacion.establecerNota("B123", "1", 7.5)
     programacion.establecerNota("B123", "2", 10.0)
-    programacion.calcularEvaluacionFinal("B123")
+    programacion.calculaEvaluacionFinal("B123")
     programacion.bajaAlumno("F123")
     println("En la primera evaluacion hay ${programacion.numeroAprovados("0")} aprovados")
     println("La nota más baja de la primera evaluacion es ${programacion.notaMasBaja("0")}")
