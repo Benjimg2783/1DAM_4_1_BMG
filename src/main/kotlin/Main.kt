@@ -81,7 +81,7 @@ data class Modulo(val maxAlumnos: Int) {
 
     //Comprueba si hay alumnos con diez
     fun hayAlumnosConDiez(evaluacion: String): Boolean {
-        return if (evaluacion == "0" || evaluacion == "1" || evaluacion == "2" || evaluacion == "3") evaluaciones[evaluacion.toInt()].any { it >= 5.0 }
+        return if (evaluacion == "0" || evaluacion == "1" || evaluacion == "2" || evaluacion == "3") evaluaciones[evaluacion.toInt()].any { it == 10.0 }
         else false
     }
 
