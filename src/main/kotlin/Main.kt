@@ -42,8 +42,8 @@ data class Modulo(val maxAlumnos: Int) {
         return listaNota
     }
 
-    //Devuelve el numero de alumnos aprovados en una evaluacion concreta
-    fun numeroAprovados(evaluacion: String): Int {
+    //Devuelve el numero de alumnos aprobados en una evaluacion concreta
+    fun numeroAprobados(evaluacion: String): Int {
         return if (evaluacion == "0" || evaluacion == "1" || evaluacion == "2" || evaluacion == "3") {
             evaluaciones[evaluacion.toInt()].count { it > 4.99 }
         } else 0
@@ -172,7 +172,7 @@ fun main() {
     if (programacion.hayAlumnosAprobados("1")) println("Si hay alumnos aprobados en la segunda evaluacion")
     else println("No ay alumnos aprobados en la segunda evaluacion")
     println("La primera nota suspensa encontrada es ${programacion.primeraNotaNoAprovada("1")}")
-    println("En la primera evaluacion hay ${programacion.numeroAprovados("0")} aprobados")
+    println("En la primera evaluacion hay ${programacion.numeroAprobados("0")} aprobados")
     println("La nota más baja de la primera evaluacion es ${programacion.notaMasBaja("0")}")
     println("La nota más alta de la evaluacion final es ${programacion.notaMasAlta("3")}")
     println("La nota media de la primera evaluación es ${programacion.notaMedia("0")}")
