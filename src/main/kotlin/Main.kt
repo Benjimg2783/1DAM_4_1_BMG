@@ -137,7 +137,7 @@ data class Modulo(val maxAlumnos: Int) {
 
 class Alumno(val id: String, val nombre: String, val apellidos: String)
 
-fun main() {
+fun main()  {
     val programacion = Modulo(15)
     val alumno1 = Alumno("A123", "Jesus", "Morales")
     val alumno2 = Alumno("B123", "Juan", "Angulo")
